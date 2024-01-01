@@ -47,3 +47,22 @@ func BuildListPayload(todoListLimit string, todoListOffset string) (*todo.ListPa
 
 	return v, nil
 }
+
+// BuildShowPayload builds the payload for the todo show endpoint from CLI
+// flags.
+func BuildShowPayload(todoShowID string) (*todo.ShowPayload, error) {
+	var err error
+	var id uint32
+	{
+		var v uint64
+		v, err = strconv.ParseUint(todoShowID, 10, 32)
+		id = uint32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for id, must be UINT32")
+		}
+	}
+	v := &todo.ShowPayload{}
+	v.ID = id
+
+	return v, nil
+}

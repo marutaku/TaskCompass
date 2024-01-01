@@ -24,17 +24,17 @@ import (
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
 	return `auth (login|register|logout)
-todo list
+todo (list|show)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` auth login --body '{
-      "password": "Quia rerum enim cupiditate eaque nihil dolore.",
-      "username": "Voluptatum molestias assumenda."
+      "password": "Eaque nihil dolore corrupti odit enim.",
+      "username": "Molestias assumenda ea quia rerum enim."
    }'` + "\n" +
-		os.Args[0] + ` todo list --limit 3527063431 --offset 2405509148` + "\n" +
+		os.Args[0] + ` todo list --limit 2423154054 --offset 3269417336` + "\n" +
 		""
 }
 
@@ -64,6 +64,9 @@ func ParseEndpoint(
 		todoListFlags      = flag.NewFlagSet("list", flag.ExitOnError)
 		todoListLimitFlag  = todoListFlags.String("limit", "", "")
 		todoListOffsetFlag = todoListFlags.String("offset", "", "")
+
+		todoShowFlags  = flag.NewFlagSet("show", flag.ExitOnError)
+		todoShowIDFlag = todoShowFlags.String("id", "REQUIRED", "ID of todo to show")
 	)
 	authFlags.Usage = authUsage
 	authLoginFlags.Usage = authLoginUsage
@@ -72,6 +75,7 @@ func ParseEndpoint(
 
 	todoFlags.Usage = todoUsage
 	todoListFlags.Usage = todoListUsage
+	todoShowFlags.Usage = todoShowUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -125,6 +129,9 @@ func ParseEndpoint(
 			case "list":
 				epf = todoListFlags
 
+			case "show":
+				epf = todoShowFlags
+
 			}
 
 		}
@@ -166,6 +173,9 @@ func ParseEndpoint(
 			case "list":
 				endpoint = c.List()
 				data, err = todoc.BuildListPayload(*todoListLimitFlag, *todoListOffsetFlag)
+			case "show":
+				endpoint = c.Show()
+				data, err = todoc.BuildShowPayload(*todoShowIDFlag)
 			}
 		}
 	}
@@ -199,8 +209,8 @@ Login to the system
 
 Example:
     %[1]s auth login --body '{
-      "password": "Quia rerum enim cupiditate eaque nihil dolore.",
-      "username": "Voluptatum molestias assumenda."
+      "password": "Eaque nihil dolore corrupti odit enim.",
+      "username": "Molestias assumenda ea quia rerum enim."
    }'
 `, os.Args[0])
 }
@@ -213,8 +223,8 @@ Register a new user
 
 Example:
     %[1]s auth register --body '{
-      "password": "Voluptatem officia vero fugiat cumque ab.",
-      "username": "Eveniet consequatur aut ipsam."
+      "password": "Iure dolore.",
+      "username": "Officia vero fugiat cumque."
    }'
 `, os.Args[0])
 }
@@ -227,7 +237,7 @@ Logout of the system
 
 Example:
     %[1]s auth logout --body '{
-      "token": "Quasi magni dolor quia et."
+      "token": "Quia et est expedita."
    }'
 `, os.Args[0])
 }
@@ -240,6 +250,7 @@ Usage:
 
 COMMAND:
     list: List all todos
+    show: Show a todo
 
 Additional help:
     %[1]s todo COMMAND --help
@@ -253,6 +264,17 @@ List all todos
     -offset UINT32: 
 
 Example:
-    %[1]s todo list --limit 3527063431 --offset 2405509148
+    %[1]s todo list --limit 2423154054 --offset 3269417336
+`, os.Args[0])
+}
+
+func todoShowUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] todo show -id UINT32
+
+Show a todo
+    -id UINT32: ID of todo to show
+
+Example:
+    %[1]s todo show --id 1455715248
 `, os.Args[0])
 }

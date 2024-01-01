@@ -20,6 +20,13 @@ type ListResponseBody struct {
 	Todos TodoCollectionResponseBody `form:"todos,omitempty" json:"todos,omitempty" xml:"todos,omitempty"`
 }
 
+// ShowResponseBody is the type of the "todo" service "show" endpoint HTTP
+// response body.
+type ShowResponseBody struct {
+	// Todo to show
+	Todo *TodoResponseBody `form:"todo,omitempty" json:"todo,omitempty" xml:"todo,omitempty"`
+}
+
 // TodoCollectionResponseBody is used to define fields on response body types.
 type TodoCollectionResponseBody []*TodoResponseBody
 
@@ -57,10 +64,31 @@ func NewListResultOK(body *ListResponseBody) *todo.ListResult {
 	return v
 }
 
+// NewShowResultOK builds a "todo" service "show" endpoint result from a HTTP
+// "OK" response.
+func NewShowResultOK(body *ShowResponseBody) *todo.ShowResult {
+	v := &todo.ShowResult{}
+	if body.Todo != nil {
+		v.Todo = unmarshalTodoResponseBodyToTodoTodo(body.Todo)
+	}
+
+	return v
+}
+
 // ValidateListResponseBody runs the validations defined on ListResponseBody
 func ValidateListResponseBody(body *ListResponseBody) (err error) {
 	if body.Todos != nil {
 		if err2 := ValidateTodoCollectionResponseBody(body.Todos); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateShowResponseBody runs the validations defined on ShowResponseBody
+func ValidateShowResponseBody(body *ShowResponseBody) (err error) {
+	if body.Todo != nil {
+		if err2 := ValidateTodoResponseBody(body.Todo); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}

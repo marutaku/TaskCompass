@@ -7,7 +7,16 @@
 
 package client
 
+import (
+	"fmt"
+)
+
 // ListTodoPath returns the URL path to the todo service list HTTP endpoint.
 func ListTodoPath() string {
 	return "/todos"
+}
+
+// ShowTodoPath returns the URL path to the todo service show HTTP endpoint.
+func ShowTodoPath(id uint32) string {
+	return fmt.Sprintf("/todos/%v", id)
 }

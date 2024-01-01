@@ -23,3 +23,9 @@ func (s *todosrvc) List(ctx context.Context, p *todo.ListPayload) (res *todo.Lis
 	s.logger.Print("todo.list")
 	return
 }
+
+func (s *todosrvc) Show(ctx context.Context, p *todo.ShowPayload) (res *todo.ShowResult, err error) {
+	res = &todo.ShowResult{}
+	s.logger.Print("todo.show")
+	return
+}

@@ -18,6 +18,13 @@ type ListResponseBody struct {
 	Todos TodoCollectionResponseBody `form:"todos,omitempty" json:"todos,omitempty" xml:"todos,omitempty"`
 }
 
+// ShowResponseBody is the type of the "todo" service "show" endpoint HTTP
+// response body.
+type ShowResponseBody struct {
+	// Todo to show
+	Todo *TodoResponseBody `form:"todo,omitempty" json:"todo,omitempty" xml:"todo,omitempty"`
+}
+
 // TodoCollectionResponseBody is used to define fields on response body types.
 type TodoCollectionResponseBody []*TodoResponseBody
 
@@ -54,11 +61,29 @@ func NewListResponseBody(res *todo.ListResult) *ListResponseBody {
 	return body
 }
 
+// NewShowResponseBody builds the HTTP response body from the result of the
+// "show" endpoint of the "todo" service.
+func NewShowResponseBody(res *todo.ShowResult) *ShowResponseBody {
+	body := &ShowResponseBody{}
+	if res.Todo != nil {
+		body.Todo = marshalTodoTodoToTodoResponseBody(res.Todo)
+	}
+	return body
+}
+
 // NewListPayload builds a todo service list endpoint payload.
 func NewListPayload(limit *uint32, offset *uint32) *todo.ListPayload {
 	v := &todo.ListPayload{}
 	v.Limit = limit
 	v.Offset = offset
+
+	return v
+}
+
+// NewShowPayload builds a todo service show endpoint payload.
+func NewShowPayload(id uint32) *todo.ShowPayload {
+	v := &todo.ShowPayload{}
+	v.ID = id
 
 	return v
 }

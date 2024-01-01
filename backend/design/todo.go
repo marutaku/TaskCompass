@@ -21,4 +21,20 @@ var _ = Service("todo", func() {
 			Response(StatusOK)
 		})
 	})
+
+	Method("show", func() {
+		Description("Show a todo")
+		Payload(func() {
+			Attribute("id", UInt32, "ID of todo to show")
+			Required("id")
+		})
+		Result(func() {
+			Attribute("todo", Todo, "Todo to show")
+		})
+
+		HTTP(func() {
+			GET("/todos/{id}")
+			Response(StatusOK)
+		})
+	})
 })
